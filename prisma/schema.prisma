@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  isVerified    Boolean    @default(false)
+  role          String     @default("USER")
+  name          String     @db.VarChar(100)
+  image         String?
+  bloodGroup    String?    @db.VarChar(3)
+  phoneNumber   String?    @db.VarChar(15)
+  division      String?    @db.VarChar(50)
+  district      String?    @db.VarChar(50)
+  upazilla      String?    @db.VarChar(50)
+  occupation    String?    @db.VarChar(100)
+  age           String?    @db.VarChar(3)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  lastDonatedAt DateTime?
+  donations     Donation[]
+}
+
+model Donation {
+  id        String   @id @default(cuid())
+  userId    String
+  donatedAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
