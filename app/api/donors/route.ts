@@ -1,6 +1,6 @@
-import {NextRequest, NextResponse} from 'next/server';
-import {PrismaClient} from '@prisma/client';
-import {auth} from "@/auth";
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import { auth } from "@/auth";
 
 const prisma = new PrismaClient();
 
@@ -11,8 +11,8 @@ export async function GET(request: NextRequest) {
 
     if (isAuthenticated && session?.user?.email) {
         const currentUser = await prisma.user.findUnique({
-            where: {email: session.user.email},
-            select: {role: true}
+            where: { email: session.user.email },
+            select: { role: true }
         });
         if (currentUser?.role === 'ADMIN') {
             isAdmin = true;
@@ -26,13 +26,15 @@ export async function GET(request: NextRequest) {
     const availability = searchParams.get('availability');
     const bloodGroup = searchParams.get('bloodGroup');
     const search = searchParams.get('search');
+    const isVerified = searchParams.get('isVerified');
+
     const page = parseInt(searchParams.get('page') || '1', 10);
     const page_size = parseInt(searchParams.get('page_size') || '10', 10);
     const fourMonthsAgo = new Date();
     fourMonthsAgo.setMonth(fourMonthsAgo.getMonth() - 4);
 
     const where: any = {
-        bloodGroup: {not: null},
+        bloodGroup: { not: null },
         //isVerified: true
     };
 
@@ -49,10 +51,17 @@ export async function GET(request: NextRequest) {
     }
 
     if (availability === 'available') {
-        where.lastDonatedAt = {lte: fourMonthsAgo, not: null};
+        where.lastDonatedAt = { lte: fourMonthsAgo, not: null };
     } else if (availability === 'unavailable') {
-        where.lastDonatedAt = {gt: fourMonthsAgo, not: null};
+        where.lastDonatedAt = { gt: fourMonthsAgo, not: null };
     }
+
+    if (isVerified === 'true') {
+        where.isVerified = true;
+    } else if (isVerified === 'false') {
+        where.isVerified = false;
+    }
+
 
     if (bloodGroup) {
         where.bloodGroup = bloodGroup;
@@ -60,15 +69,15 @@ export async function GET(request: NextRequest) {
 
     if (search) {
         where.OR = [
-            {name: {contains: search, mode: 'insensitive'}},
-            {bloodGroup: {contains: search, mode: 'insensitive'}},
-            {division: {contains: search, mode: 'insensitive'}},
-            {district: {contains: search, mode: 'insensitive'}},
-            {upazilla: {contains: search, mode: 'insensitive'}},
+            { name: { contains: search, mode: 'insensitive' } },
+            { bloodGroup: { contains: search, mode: 'insensitive' } },
+            { division: { contains: search, mode: 'insensitive' } },
+            { district: { contains: search, mode: 'insensitive' } },
+            { upazilla: { contains: search, mode: 'insensitive' } },
         ];
     }
 
-    const count = await prisma.user.count({where});
+    const count = await prisma.user.count({ where });
     const previous = page > 1 ? page - 1 : null;
     const next = page * page_size < count ? page + 1 : null;
 
@@ -83,6 +92,7 @@ export async function GET(request: NextRequest) {
             district: true,
             upazilla: true,
             image: true,
+           
             ...(isAuthenticated ? {
                 email: true,
                 isVerified: true,
@@ -105,23 +115,23 @@ export async function GET(request: NextRequest) {
             : 'N/A',
     }));
 
-    return NextResponse.json({count, previous, next, donors: donorsWithLocation});
+    return NextResponse.json({ count, previous, next, donors: donorsWithLocation });
 }
 
 export async function POST(request: NextRequest) {
     const session = await auth()
 
     if (!session || !session.user || !session.user.email) {
-        return new NextResponse("Unauthorized", {status: 401})
+        return new NextResponse("Unauthorized", { status: 401 })
     }
 
     const currentUser = await prisma.user.findUnique({
-        where: {email: session.user.email},
-        select: {role: true}
+        where: { email: session.user.email },
+        select: { role: true }
     })
 
     if (!currentUser || currentUser.role !== 'ADMIN') {
-        return new NextResponse("Forbidden", {status: 403})
+        return new NextResponse("Forbidden", { status: 403 })
     }
 
     try {
@@ -129,16 +139,16 @@ export async function POST(request: NextRequest) {
 
         // Validate required fields
         if (!userData.name || !userData.email) {
-            return NextResponse.json({error: 'Name and email are required'}, {status: 400})
+            return NextResponse.json({ error: 'Name and email are required' }, { status: 400 })
         }
 
         // Check if user with the same email already exists
         const existingUser = await prisma.user.findUnique({
-            where: {email: userData.email}
+            where: { email: userData.email }
         })
 
         if (existingUser) {
-            return NextResponse.json({error: 'User with this email already exists'}, {status: 400})
+            return NextResponse.json({ error: 'User with this email already exists' }, { status: 400 })
         }
 
         // Create new user
@@ -161,7 +171,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(newUser)
     } catch (error) {
         console.error('Error creating user:', error)
-        return NextResponse.json({error: 'Failed to create user'}, {status: 500})
+        return NextResponse.json({ error: 'Failed to create user' }, { status: 500 })
     } finally {
         await prisma.$disconnect()
     }
