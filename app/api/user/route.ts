@@ -36,10 +36,9 @@ export async function PUT(req: Request) {
         }
 
         const email = session.user.email;
-        const { name, age, bloodGroup, phoneNumber, division, district, upazilla, occupation } = await req.json();
-        console.log(name, age, bloodGroup, phoneNumber, division, district, upazilla, occupation);
+        const { name, age, bloodGroup, phoneNumber, division, district, upazilla, occupation, isVerified } = await req.json();
 
-        if (!name || !age || !bloodGroup || !phoneNumber || !division || !district || !upazilla || !occupation) {
+        if (!name || !age || !bloodGroup || !phoneNumber || !division || !district || !upazilla || !occupation || !isVerified) {
             return new Response("Bad Request", { status: 400 });
         }
 
@@ -62,7 +61,8 @@ export async function PUT(req: Request) {
                 division,
                 district,
                 upazilla,
-                occupation
+                occupation,
+                isVerified,
             },
         });
 
