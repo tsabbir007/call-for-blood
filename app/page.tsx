@@ -1,12 +1,10 @@
 import { PrismaClient } from "@prisma/client"
-import Navbar from "@/components/navbar/navbar"
 import { DonorTable } from "@/components/table/donor-table"
 import Hero from "@/components/hero"
 import DonateButton from "@/components/donate-button"
 import DonationProcess from "@/components/donation-process"
 import Footer from "@/components/footer"
-
-const prisma = new PrismaClient()
+import Navbar from "@/components/navbar/navbar"
 
 export default async function HomePage() {
     return (
