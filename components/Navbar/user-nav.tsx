@@ -16,8 +16,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import {PrismaClient} from "@prisma/client";
 import {auth} from "@/auth";
-import SignOut from "@/components/Navbar/sign-out";
-import SignIn from "@/components/Navbar/sign-in";
+import SignOut from "@/components/navbar/sign-out";
+import SignIn from "@/components/navbar/sign-in";
 import Link from "next/link";
 
 const prisma = new PrismaClient();
@@ -28,7 +28,7 @@ export async function UserNav() {
     if (!session) {
         return (
             <SignIn callbackUrl={`/profile`}>
-                Sign in for Donate Blood 🩸
+                Sign in for Donate
             </SignIn>
         )
     }
