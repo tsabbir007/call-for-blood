@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession } from "next-auth/react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { UserProfileForm,  UserFormData } from "./user-profile-form";
+import { UserProfileForm, UserFormData } from "./user-profile-form";
 import { UserProfileCard } from "./user-profile-card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -29,8 +29,8 @@ const userFormSchema = z.object({
 export default function ProfilePage() {
     const [image, setImage] = useState('');
     const [loading, setLoading] = useState(true);
-    const {data: session, status} = useSession();
-    const [userData, setUserData] = useState({
+    const { data: session, status } = useSession();
+    const [userData, setUserData] = useState<UserFormData>({
         name: '',
         age: '',
         bloodGroup: '',
@@ -39,13 +39,17 @@ export default function ProfilePage() {
         district: '',
         upazilla: '',
         occupation: '',
+        email: '',
+        role: 'USER' as const,
+        isVerified: false
     });
+
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const userForm = useForm<z.infer<typeof userFormSchema>>({
         resolver: zodResolver(userFormSchema),
         defaultValues: userData,
-    }); 
+    });
 
     useEffect(() => {
         if (session?.user) {
@@ -57,7 +61,7 @@ export default function ProfilePage() {
     const fetchUserData = async () => {
         try {
             const response = await fetch('/api/user', {
-                next: {revalidate: 1800} // Cache for 30 minutes
+                next: { revalidate: 1800 } // Cache for 30 minutes
             });
             const data = await response.json();
             setUserData(data);
@@ -76,17 +80,17 @@ export default function ProfilePage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
         });
-        
+
         if (!response.ok) {
             throw new Error('Failed to update profile');
         }
-        
+
         setUserData(data);
     };
 
     if (status === "loading" || loading) {
         return <div className="flex justify-center items-center h-screen">
-            <Loader2 className="h-8 w-8 animate-spin"/>
+            <Loader2 className="h-8 w-8 animate-spin" />
         </div>;
     }
 
@@ -96,20 +100,20 @@ export default function ProfilePage() {
                 <div className="container mx-auto px-4 py-4 flex justify-between items-center">
                     <Link href="/">
                         <Button variant="ghost" size="icon">
-                            <ArrowLeft className="h-6 w-6"/>
+                            <ArrowLeft className="h-6 w-6" />
                         </Button>
                     </Link>
                     <h1 className="text-2xl font-bold text-primary">Profile</h1>
-                    <div className="w-10"/>
+                    <div className="w-10" />
                 </div>
             </header>
             <main className="container mx-auto px-4 py-8">
-                <UserProfileCard 
+                <UserProfileCard
                     userData={userData}
                     image={image}
-                    onEditClick={() => setIsEditModalOpen(true)}
+                    onUpdateProfile={handleUpdateProfile}
                 />
-                
+
                 <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
                     <DialogContent className="sm:max-w-[450px]">
                         <DialogHeader>
@@ -118,10 +122,9 @@ export default function ProfilePage() {
                                 Make changes to your profile here. Click save when you are done.
                             </DialogDescription>
                         </DialogHeader>
-                        <UserProfileForm 
+                        <UserProfileForm
                             initialData={userData}
                             onSubmit={handleUpdateProfile}
-                            onSuccess={() => setIsEditModalOpen(false)}
                         />
                     </DialogContent>
                 </Dialog>
