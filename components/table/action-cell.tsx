@@ -3,10 +3,11 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { MoreHorizontal } from "lucide-react"
+import { MoreHorizontal, Trash2 } from "lucide-react"
 import toast from "react-hot-toast"
 import { UserProfileForm, userFormSchema } from '@/app/profile/user-profile-form'
 import { z } from 'zod'
+import { deleteUser } from '@/app/services/user'
 
 // Extend the user form schema to include admin-specific fields
 const editUserSchema = z.object({
@@ -54,6 +55,7 @@ export default function ActionCell({ donor }: { donor: Donor }) {
     }
 
     const handleSubmit = async (data: EditUserFormData) => {
+        console.log("sabbir submit")
         setLoading(true)
         try {
             const response = await fetch(`/api/donors/${donor.id}`, {
@@ -79,14 +81,21 @@ export default function ActionCell({ donor }: { donor: Donor }) {
         }
     }
 
+    const handleDelete = async () => {
+        alert("Are you sure you want to delete this user?")
+        await deleteUser(donor.id)
+    }
+
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
+        <div className="flex gap-2">
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <DialogTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
                     <span className="sr-only">Open menu</span>
                     <MoreHorizontal className="h-4 w-4" />
                 </Button>
             </DialogTrigger>
+
             <DialogContent className="h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Edit User</DialogTitle>
@@ -96,8 +105,13 @@ export default function ActionCell({ donor }: { donor: Donor }) {
                     onSubmit={handleSubmit}
                     loading={loading}
                     showAdminFields
+                    buttonText="Update User"
                 />
-            </DialogContent>
-        </Dialog>
+                </DialogContent>
+            </Dialog>
+            <Button variant="ghost" onClick={handleDelete}>
+                <Trash2 className="w-4 h-4" />
+            </Button>
+        </div>
     )
 }

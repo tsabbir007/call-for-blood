@@ -19,5 +19,15 @@ export async function fetchUser(userId: string) {
     }
     return response.json();
   }
+
+  export async function deleteUser(userId: string) {
+    const response = await fetch(`/api/donors/${userId}`, {
+        method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete user data');
+    }
+    return response.json();
+  }
   
   

@@ -11,13 +11,13 @@ import { Switch } from '@/components/ui/switch';
 
 export const userFormSchema = z.object({
     name: z.string().min(2, 'Name must be at least 2 characters').max(100),
-    age: z.string().regex(/^[0-9]{1,3}$/, 'Invalid age'),
+    age: z.string().regex(/^[0-9]{1,3}$/, 'Invalid age').optional(),
     bloodGroup: z.string().regex(/^(A|B|AB|O)[+-]$/, 'Invalid blood group'),
-    phoneNumber: z.string().regex(/^\+?[0-9]{11}$/, 'Invalid phone number'),
-    division: z.string().min(2, 'Division is required'),
-    district: z.string().min(2, 'District is required'),
-    upazilla: z.string().min(2, 'Upazilla is required'),
-    occupation: z.string().min(2).max(100),
+    phoneNumber: z.string().regex(/^\+?[0-9]{11}$/, 'Invalid phone number').optional(),
+    division: z.string().min(2, 'Division is required').optional(),
+    district: z.string().min(2, 'District is required').optional(),
+    upazilla: z.string().min(2, 'Upazilla is required').optional(),
+    occupation: z.string().min(2).max(100).optional(),
     email: z.string().email('Invalid email address'),
     role: z.enum(['USER', 'ADMIN']),
     isVerified: z.boolean(),
@@ -30,13 +30,15 @@ interface UserProfileFormProps {
     onSubmit: (data: UserFormData) => Promise<void>;
     loading?: boolean;
     showAdminFields?: boolean;
+    buttonText?: string;
 }
 
 export function UserProfileForm({
     initialData,
     onSubmit,
     loading = false,
-    showAdminFields = false
+    showAdminFields = false,
+    buttonText = 'Save Changes',
 }: UserProfileFormProps) {
     const [divisions, setDivisions] = useState<string[]>([]);
     const [districts, setDistricts] = useState<{ district: string; upazilla: string[] }[]>([]);
@@ -297,10 +299,12 @@ export function UserProfileForm({
                         </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full" disabled={loading}>
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {showAdminFields ? 'Add User' : 'Save Changes'}
-                </Button>
+                <div className="flex justify-between gap-4">
+                    <Button type="submit" className="w-full" disabled={loading}>
+                        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {buttonText ? buttonText : showAdminFields ? 'Add User' : 'Save Changes'}
+                    </Button>
+                </div>
             </form>
         </Form>
     );

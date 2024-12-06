@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+    
     const { id } = params
 
     if (!id) {
@@ -53,6 +54,27 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     } catch (error) {
         console.error('Error updating user:', error)
         return NextResponse.json({ error: 'Failed to update user' }, { status: 500 })
+    } finally {
+        await prisma.$disconnect()
+    }
+}
+
+
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+    const { id } = params
+    try {
+        // First delete all donations associated with the user
+        await prisma.donation.deleteMany({
+            where: { userId: id }
+        });
+        
+        // Then delete the user
+        await prisma.user.delete({ where: { id } });
+        
+        return NextResponse.json({ message: "User and associated data deleted successfully" });
+    } catch (error) {
+        console.error('Error deleting user:', error)
+        return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 })
     } finally {
         await prisma.$disconnect()
     }

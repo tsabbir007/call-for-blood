@@ -31,6 +31,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PaginationDemo } from "@/components/table/pagination"
 import ActionCell from './action-cell'
 import AddUserDialog from './add-user-dialog'
+import { RefreshCcw } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 export interface Donor {
     id: string
@@ -336,6 +338,11 @@ export function DonorTable() {
                 }}>
                     Clear Filters
                 </Button>
+              
+                <Button variant={"ghost"} onClick={fetchDonors}>
+                    <RefreshCcw className={cn("w-4 h-4", loading && "animate-spin")} />
+                </Button>
+
                 <div className={`ms-auto`}>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
