@@ -25,7 +25,7 @@ export default async function HomePage() {
                 </div>
             </div>
 
-            <div className="container space-y-16 lg:space-y-32 pt-16 lg:pt-32 px-4">
+            <div className="container space-y-16 lg:space-y-32 pt-16 lg:pt-32">
                 <DonationProcess />
                 <DonorTable />
             </div>
