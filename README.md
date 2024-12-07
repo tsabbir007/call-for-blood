@@ -30,12 +30,10 @@ This platform is built to help save lives by creating a reliable and responsive 
 ## 🛠️ Technology Stack
 - **Framework**: [Next.js](https://nextjs.org/)
 - **Database**: [Prisma](https://www.prisma.io/)
-- **Authentication**: [NextAuth.js](https://next-auth.js.org/)
+- **Authentication**: [NextAuth](https://next-auth.js.org/)
 - **Hosting**: [Vercel](https://vercel.com/)
 - **Programming Language**: [TypeScript](https://www.typescriptlang.org/)
 - **UI Components**: [Shadcn](https://shadcn.dev/) & [Tailwind CSS](https://tailwindcss.com/)
-- **Auth**: [Next Auth](https://https://next-auth.js.org/)
-
 ---
 
 ## 🚀 Site Link
@@ -144,12 +142,17 @@ Upon successful sign-in, users are directed to their profile and dashboard.
 3. Set up environment variables:
    - Refer to `.env.example` for the required variables and configure them in a `.env` file.
 
-4. Run the development server:
+4. Generate Prisma client:
+   ```bash
+   npx prisma generate
+   ```   
+
+5. Run the development server:
    ```bash
    npm run dev
    ```
 
-5. Open your browser and navigate to:
+6. Open your browser and navigate to:
    ```
    http://localhost:3000
    ```
